@@ -253,10 +253,9 @@ def TrainModels(
     return models, isotonic_models, base_rmse, isotonic_rmse, oof_predictions, isotonic_oof_preds
 
 def Objective(trial, fold_count, extra_train_paths, starting_eval_json_paths):
-    GAME_CACHE_FILEPATH = '/mnt/data01/data/TreeSearch/data/from_organizers/train.csv'
-    COMMON_GAMES_FILEPATH = 'data/from_organizers/train.csv'
+    GAMES_FILEPATH = 'data/train.csv'
     ruleset_names, lud_rules, train_test_df = GetPreprocessedData(
-        games_csv_path = GAME_CACHE_FILEPATH if os.path.exists(GAME_CACHE_FILEPATH) else COMMON_GAMES_FILEPATH, 
+        games_csv_path = GAMES_FILEPATH, 
     )
 
     extra_train_df = None
@@ -390,10 +389,9 @@ def CreateEnsemble(
         feature_importances_dir,
         dropped_feature_count,
         output_directory_suffix = ''):
-    GAME_CACHE_FILEPATH = '/mnt/data01/data/TreeSearch/data/from_organizers/train.csv'
-    COMMON_GAMES_FILEPATH = 'data/from_organizers/train.csv'
+    GAMES_FILEPATH = 'data/train.csv'
     ruleset_names, lud_rules, train_test_df = GetPreprocessedData(
-        games_csv_path = GAME_CACHE_FILEPATH if os.path.exists(GAME_CACHE_FILEPATH) else COMMON_GAMES_FILEPATH, 
+        games_csv_path = GAMES_FILEPATH, 
     )
 
     extra_train_df = None
@@ -810,31 +808,24 @@ if __name__ == '__main__':
     for mcts_config_name in MCTS_CONFIG_NAMES:
         for mcts_runtime_sec in MCTS_RUNTIMES_SEC:
             for lgbm_config_index, lgbm_params in enumerate(LGBM_CONFIGS):
-                for use_reann_aug in [True, False]:
-                    # if lgbm_config_index not in [1, 2]:
+                for use_reann_aug in [False]:
                     if lgbm_config_index not in [5]:
-                    # if lgbm_config_index not in [2]:
                         continue
 
                     extra_train_paths = {
-                        # 'games_csv_path': 'GAVEL/generated_csvs/complete_datasets/2024-10-23_15-10-16.csv', # V4
-                        # 'starting_position_evals_json_paths': [
-                        #     f'StartingPositionEvaluation/Evaluations/FromKaggle_v2/extra_v5_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
-                        #     for i in range(10)
-                        # ]
-                        'games_csv_path': 'GAVEL/generated_csvs/complete_datasets/2024-11-25_21-41-25.csv', # V6
+                        'games_csv_path': 'data/ExtraAnnotatedGames_v6.csv',
                         'starting_position_evals_json_paths': [
-                            f'StartingPositionEvaluation/Evaluations/FromKaggle_v2/merged_extra_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
+                            f'data/StartingPositionEvals/StartingPositionEvals/merged_extra_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
                             for i in range(10)
                         ]
                     }
                     starting_eval_json_paths = [
-                        f'StartingPositionEvaluation/Evaluations/FromKaggle_v2/organizer_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
+                        f'data/StartingPositionEvals/StartingPositionEvals/organizer_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
                         for i in range(10)
                     ]
 
                     if use_reann_aug:
-                        reannotated_features_path = 'data/reannotation/lud_to_features_to_estimates_v2.0.json'
+                        reannotated_features_path = 'data/RecomputedFeatureEstimates.json'
                     else:
                         reannotated_features_path = None
 

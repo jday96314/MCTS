@@ -259,10 +259,9 @@ def TrainModels(
     return models, isotonic_models, base_rmse, isotonic_rmse, oof_predictions, isotonic_oof_preds
 
 def Objective(trial, fold_count: int, extra_train_paths: Dict, starting_eval_json_paths: List[str]) -> float:
-    GAME_CACHE_FILEPATH = '/mnt/data01/data/TreeSearch/data/from_organizers/train.csv'
-    COMMON_GAMES_FILEPATH = 'data/from_organizers/train.csv'
+    GAMES_FILEPATH = 'data/train.csv'
     ruleset_names, lud_rules, train_test_df = GetPreprocessedData(
-        games_csv_path = GAME_CACHE_FILEPATH if os.path.exists(GAME_CACHE_FILEPATH) else COMMON_GAMES_FILEPATH, 
+        games_csv_path = GAMES_FILEPATH, 
     )
 
     extra_train_df = None
@@ -366,10 +365,9 @@ def GetOptimalConfig(trial_count: int, extra_train_paths: Dict, starting_eval_js
         json.dump(study.best_params, f, indent=4)
 
 def GetOptimalLr(extra_train_paths: Dict, starting_eval_json_paths: List[str]):
-    GAME_CACHE_FILEPATH = '/mnt/data01/data/TreeSearch/data/from_organizers/train.csv'
-    COMMON_GAMES_FILEPATH = 'data/from_organizers/train.csv'
+    GAMES_FILEPATH = 'data/train.csv'
     ruleset_names, lud_rules, train_test_df = GetPreprocessedData(
-        games_csv_path = GAME_CACHE_FILEPATH if os.path.exists(GAME_CACHE_FILEPATH) else COMMON_GAMES_FILEPATH, 
+        games_csv_path = GAMES_FILEPATH, 
     )
 
     extra_train_df = None
@@ -467,10 +465,9 @@ def CreateEnsemble(
         global_average_weight: float,
         output_directory_suffix: str = ''
     ) -> Tuple[float, float]:
-    GAME_CACHE_FILEPATH = '/mnt/data01/data/TreeSearch/data/from_organizers/train.csv'
-    COMMON_GAMES_FILEPATH = 'data/from_organizers/train.csv'
+    GAMES_FILEPATH = 'data/train.csv'
     ruleset_names, lud_rules, train_test_df = GetPreprocessedData(
-        games_csv_path = GAME_CACHE_FILEPATH if os.path.exists(GAME_CACHE_FILEPATH) else COMMON_GAMES_FILEPATH, 
+        games_csv_path = GAMES_FILEPATH, 
     )
 
     extra_train_df = None
@@ -897,7 +894,6 @@ if __name__ == '__main__':
     ]
 
     MCTS_CONFIG_NAMES = [
-        # '1.41421356237-random-false',
         '0.6-random-true',
     ]
     MCTS_RUNTIMES_SEC = [15]
@@ -911,27 +907,20 @@ if __name__ == '__main__':
                             continue
 
                         updated_extra_train_paths = {
-                            # 'games_csv_path': 'GAVEL/generated_csvs/complete_datasets/2024-10-23_15-10-16.csv', # V4
-                            # 'starting_position_evals_json_paths': [
-                            #     f'StartingPositionEvaluation/Evaluations/FromKaggle_v2/extra_v5_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
-                            #     for i in range(10)
-                            # ]
-                            'games_csv_path': 'GAVEL/generated_csvs/complete_datasets/2024-11-25_21-41-25.csv', # V6
+                            'games_csv_path': 'data/ExtraAnnotatedGames_v6.csv',
                             'starting_position_evals_json_paths': [
-                                f'StartingPositionEvaluation/Evaluations/FromKaggle_v2/merged_extra_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
+                                f'data/StartingPositionEvals/StartingPositionEvals/merged_extra_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
                                 for i in range(10)
                             ]
                         }
                         updated_starting_eval_json_paths = [
-                            f'StartingPositionEvaluation/Evaluations/FromKaggle_v2/organizer_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
+                            f'data/StartingPositionEvals/StartingPositionEvals/organizer_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
                             for i in range(10)
                         ]
-                        reannotated_features_path = 'data/reannotation/lud_to_features_to_estimates_v2.0.json'
+                        reannotated_features_path = 'data/RecomputedFeatureEstimates.json'
 
                         base_rmses, isotonic_rmses = [], []
-                        # for RANDOM_SEED in [3333, 4444, 5555]:
-                        # for RANDOM_SEED in [4444, 3333]:
-                        for RANDOM_SEED in [5555]:
+                        for RANDOM_SEED in [4444, 5555]:
                             base_rmse, isotonic_rmse = CreateEnsemble(
                                 tabm_params = tabm_params,
                                 fold_count = 10,

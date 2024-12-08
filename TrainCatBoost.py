@@ -449,10 +449,9 @@ def TrainModels(
 # 'subsample': trial.suggest_float('subsample', 0.5, 1.0),
 # 'colsample_bylevel': trial.suggest_float('colsample_bylevel', 0.5, 1.0),
 def Objective(trial, fold_count, extra_train_paths, starting_eval_json_paths):
-    GAME_CACHE_FILEPATH = '/mnt/data01/data/TreeSearch/data/from_organizers/train.csv'
-    COMMON_GAMES_FILEPATH = 'data/from_organizers/train.csv'
+    GAMES_FILEPATH = 'data/train.csv'
     ruleset_names, lud_rules, train_test_df, game_fitness_scores = GetPreprocessedData(
-        games_csv_path = GAME_CACHE_FILEPATH if os.path.exists(GAME_CACHE_FILEPATH) else COMMON_GAMES_FILEPATH, 
+        games_csv_path = GAMES_FILEPATH, 
         split_agent_features = True,
     )
 
@@ -560,10 +559,9 @@ def CreateEnsemble(
         extra_train_paths = None,
         extra_data_weight = 1.0,
         output_directory_suffix = ''):
-    GAME_CACHE_FILEPATH = '/mnt/data01/data/TreeSearch/data/from_organizers/train.csv'
-    COMMON_GAMES_FILEPATH = 'data/from_organizers/train.csv'
+    GAMES_FILEPATH = 'data/train.csv'
     ruleset_names, lud_rules, train_test_df, game_fitness_scores = GetPreprocessedData(
-        games_csv_path = GAME_CACHE_FILEPATH if os.path.exists(GAME_CACHE_FILEPATH) else COMMON_GAMES_FILEPATH, 
+        games_csv_path = GAMES_FILEPATH, 
         split_agent_features = True,
     )
 
@@ -1029,16 +1027,13 @@ if __name__ == '__main__':
     DROPPED_COLUMNS += ['MancalaBoard', 'MancalaStores', 'MancalaTwoRows', 'MancalaThreeRows', 'MancalaFourRows', 'MancalaSixRows', 'MancalaCircular', 'AlquerqueBoard', 'AlquerqueBoardWithOneTriangle', 'AlquerqueBoardWithTwoTriangles', 'AlquerqueBoardWithFourTriangles', 'AlquerqueBoardWithEightTriangles', 'ThreeMensMorrisBoard', 'ThreeMensMorrisBoardWithTwoTriangles', 'NineMensMorrisBoard', 'StarBoard', 'CrossBoard', 'KintsBoard', 'PachisiBoard', 'FortyStonesWithFourGapsBoard', 'Sow', 'SowCW', 'SowCCW', 'GraphStyle', 'ChessStyle', 'GoStyle', 'MancalaStyle', 'PenAndPaperStyle', 'ShibumiStyle', 'BackgammonStyle', 'JanggiStyle', 'XiangqiStyle', 'ShogiStyle', 'TableStyle', 'SurakartaStyle', 'TaflStyle', 'NoBoard', 'MarkerComponent', 'StackType', 'Stack', 'Symbols', 'ShowPieceValue', 'ShowPieceState']
 
     REANNOTATION_PATHS = [
-        'data/reannotation/lud_to_features_to_estimates_v2.0.json',
-        'data/reannotation/lud_to_features_to_estimates_v1.json'
+        'data/RecomputedFeatureEstimates.json',
     ]
-    REANNOTATION_VERSION_NUMBERS = [2, 1]
+    REANNOTATION_VERSION_NUMBERS = [2]
 
     MCTS_CONFIG_NAMES = [
-        # '1.41421356237-random-false',
         '0.6-random-true',
     ]
-    # MCTS_RUNTIMES_SEC = [15, 30]
     MCTS_RUNTIMES_SEC = [15]
     for mcts_config_name in MCTS_CONFIG_NAMES:
         for mcts_runtime_sec in MCTS_RUNTIMES_SEC:
@@ -1048,23 +1043,21 @@ if __name__ == '__main__':
                         continue
 
                     extra_train_paths = {
-                        'games_csv_path': 'GAVEL/generated_csvs/complete_datasets/2024-10-23_15-10-16.csv',
+                        'games_csv_path': 'data/ExtraAnnotatedGames_v4.csv',
                         'starting_position_evals_json_paths': [
-                            f'StartingPositionEvaluation/Evaluations/FromKaggle_v2/extra_v5_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
+                            f'data/StartingPositionEvals/StartingPositionEvals/merged_extra_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
                             for i in range(10)
                         ]
                     }
                     starting_eval_json_paths = [
-                        f'StartingPositionEvaluation/Evaluations/FromKaggle_v2/organizer_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
+                        f'data/StartingPositionEvals/StartingPositionEvals/organizer_UCB1Tuned-{mcts_config_name}_{mcts_runtime_sec}s_v2_r{i+1}.json'
                         for i in range(10)
                     ]
-                    # reannotated_features_path = 'data/reannotation/lud_to_features_to_estimates_v2.0.json'
-                    # reannotated_features_path = None
 
                     base_rmses, isotonic_rmses = [], []
                     extra_data_weight = 0.25
                     reann_suffix = f'_reann_v{REANNOTATION_VERSION_NUMBERS[reann_index]}'
-                    for RANDOM_SEED in [3333, 4444, 5555]:
+                    for RANDOM_SEED in [4444, 5555]:
                         base_rmse, isotonic_rmse = CreateEnsemble(
                             cat_params = cat_params,
                             lsa_params = LSA_CONFIG,
@@ -1076,7 +1069,7 @@ if __name__ == '__main__':
                             extra_train_paths = extra_train_paths,
                             extra_data_weight = extra_data_weight,
                             oof_prediction_path_prefix = None,
-                            output_directory_suffix = f"_et_v6_w{int(extra_data_weight*100)}_{mcts_config_name}_{mcts_runtime_sec}s_cfg{cat_config_index}_seed{RANDOM_SEED}_v2_r1-10_aug_gaw033_{reann_suffix}_drop_cir"
+                            output_directory_suffix = f"_et_v6_w{int(extra_data_weight*100)}_{mcts_config_name}_{mcts_runtime_sec}s_cfg{cat_config_index}_seed{RANDOM_SEED}_v2_r1-10_aug_gaw033_{reann_suffix}_drop"
                         )
                         base_rmses.append(base_rmse)
                         isotonic_rmses.append(isotonic_rmse)
