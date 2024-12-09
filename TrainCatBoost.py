@@ -1042,6 +1042,8 @@ if __name__ == '__main__':
                     if cat_config_index not in [3]:
                         continue
 
+                    # After the competition I noticed I accidentally trained the winning ensemble's CatBoost models with v4 extra data,
+                    # even though the model filenames suggest they were trained with v6. v4 is used here for consistency.
                     extra_train_paths = {
                         'games_csv_path': 'data/ExtraAnnotatedGames_v4.csv',
                         'starting_position_evals_json_paths': [
@@ -1069,7 +1071,7 @@ if __name__ == '__main__':
                             extra_train_paths = extra_train_paths,
                             extra_data_weight = extra_data_weight,
                             oof_prediction_path_prefix = None,
-                            output_directory_suffix = f"_et_v6_w{int(extra_data_weight*100)}_{mcts_config_name}_{mcts_runtime_sec}s_cfg{cat_config_index}_seed{RANDOM_SEED}_v2_r1-10_aug_gaw033_{reann_suffix}_drop"
+                            output_directory_suffix = f"_et_v6_w{int(extra_data_weight*100)}_{mcts_config_name}_{mcts_runtime_sec}s_cfg{cat_config_index}_seed{RANDOM_SEED}_v2_r1-10_aug_gaw033_{reann_suffix}_reann_drop"
                         )
                         base_rmses.append(base_rmse)
                         isotonic_rmses.append(isotonic_rmse)

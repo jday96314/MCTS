@@ -830,7 +830,7 @@ if __name__ == '__main__':
                         reannotated_features_path = None
 
                     base_rmses, isotonic_rmses = [], []
-                    for RANDOM_SEED in [3333, 4444, 5555]:
+                    for RANDOM_SEED in [4444, 5555]:
                         base_rmse, isotonic_rmse = CreateEnsemble(
                             lgb_params = lgbm_params,
                             early_stopping_round_count = 100,
@@ -843,7 +843,7 @@ if __name__ == '__main__':
                             feature_importances_dir = None,
                             dropped_feature_count = 0,
                             # output_directory_suffix = f'_et_v6_w100_{mcts_config_name}_{mcts_runtime_sec}s_cfg{lgbm_config_index}_seed{RANDOM_SEED}_r1-10_aug_gaw33_reann-v2_nd'
-                            output_directory_suffix = f'_et_v6_w100_{mcts_config_name}_{mcts_runtime_sec}s_cfg{lgbm_config_index}_seed{RANDOM_SEED}_r1-10_aug_gaw33{"_reann-v2" if use_reann_aug else ""}_drop_nd'
+                            output_directory_suffix = f'_et_v6_w100_{mcts_config_name}_{mcts_runtime_sec}s_cfg{lgbm_config_index}_seed{RANDOM_SEED}_r1-10_aug_gaw33{"_reann-v2" if use_reann_aug else ""}_drop'
                         )
                         base_rmses.append(base_rmse)
                         isotonic_rmses.append(isotonic_rmse)
